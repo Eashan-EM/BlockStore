@@ -3,10 +3,11 @@ const crypto = require('crypto')
 const fs = require('fs')
 
 class Block {
-  constructor (index, timestamp, data, previousHash, hash) {
+  constructor (index, timestamp, data, pubKey, previousHash, hash) {
     this.index = index;
     this.timestamp = timestamp;
     this.data = data;
+    this.pubKey = pubKey
     this.previousHash = previousHash;
     this.hash = this.calcHash()
     if (hash != '') {
@@ -17,7 +18,7 @@ class Block {
   }
   calcHash() {
     var toHash = this.index + this.timestamp + this.data + this.previousHash
-    return createHash('sha256').update(toHash).digest('base64');
+    return createHash('sha1').update(toHash).digest('base64');
   }
 
   save() {
@@ -25,6 +26,7 @@ class Block {
       index: this.index,
       timestamp: this.timestamp,
       data: this.data,
+      pubKey: this.pubKey,
       previousHash: this.previousHash,
       hash: this.hash
     })
@@ -46,12 +48,13 @@ class BlockChain {
           parse.index,
           parse.timestamp,
           parse.data,
+          parse.pubKey,
           parse.previousHash,
           parse.hash))
         this.index++
       }
     } else {
-      this.chain.push(new Block(0, Date.now().toString(), "genesis", 0, ''))
+      this.chain.push(new Block(0, Date.now().toString(), "1234", "genesis", 0, ''))
       this.bc = []
       this.index++;
       this.save()
@@ -62,6 +65,7 @@ class BlockChain {
       this.chain.length,
       Date.now().toString(),
       this.encrypt(data, pubKey),
+      pubKey,
       this.chain[this.index-1].hash,
       '')
     this.chain.push(block)
@@ -69,11 +73,10 @@ class BlockChain {
     this.save()
     return this.chain[this.index-1].hash
   }
+
   blockExists(hash) {
     for (var i=0;i<this.index;i++) {
       var b = this.chain[i]
-      console.log(b.hash)
-      console.log(hash)
       if (b.hash == hash) {
         return true
       }
@@ -92,8 +95,9 @@ class BlockChain {
         sendData.previousHash = b.previousHash
         sendData.hash = b.hash
         for (var j=0;j<b.data.length;j++) {
-          sendData.data += crypto.privateDecrypt(priKey, Buffer.from(b.data[j]))
+          sendData.data += crypto.privateDecrypt({key:priKey,passphrase:''}, Buffer.from(b.data[j])).toString("utf-8")
         }
+        console.log(sendData)
         return JSON.stringify(sendData)
     }
   }}
@@ -104,6 +108,23 @@ class BlockChain {
       response[i] = crypto.publicEncrypt(pubKey, response[i])
     }
     return response
+  }
+
+  createKeyPair() {
+    return crypto.generateKeyPairSync('rsa', { 
+        modulusLength: 520, 
+        publicKeyEncoding: { 
+            type: 'spki', 
+            format: 'pem'
+        }, 
+        privateKeyEncoding: { 
+        type: 'pkcs8', 
+        format: 'pem', 
+        cipher: 'aes-256-cbc', 
+        passphrase: ''
+        } 
+    });
+
   }
 
   save() {

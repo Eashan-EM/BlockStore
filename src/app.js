@@ -29,29 +29,15 @@ app.post("/getblock", (req, res) => {
   }
 })
 
-app.get("/newkey", (req, res) => {
+app.get("/newregister", (req, res) => {
   res.sendFile(path.join(__dirname, '../src/public/pregis.html'))
 })
 
-app.post("/registerKey", (req, res) => {
-  const keyPair = crypto.generateKeyPairSync('rsa', { 
-        modulusLength: 520, 
-        publicKeyEncoding: { 
-            type: 'spki', 
-            format: 'pem'
-        }, 
-        privateKeyEncoding: { 
-        type: 'pkcs8', 
-        format: 'pem', 
-        cipher: 'aes-256-cbc', 
-        passphrase: Date.now().toString()
-        } 
-    });
-  var data = JSON.stringify({
-    key: ["Name", "Email Address", "Phone No", "Blood Group", "Age", "Gender"],
-    value: [req.body.pname, req.body.pemail, req.body.pno, req.body.pbg, req.body.page, req.body.pgender]
-  })
+app.post("/register", (req, res) => {
+  const keyPair = bc.createKeyPair()
+  var data = JSON.stringify(req.body);
   var hash = bc.newBlock(data, keyPair.publicKey)
+  console.log(keyPair.privateKey)
   res.send(JSON.stringify({
     hash: hash,
     pubKey: keyPair.publicKey,
