@@ -1,16 +1,76 @@
 <html>
+  <head>
+    <script src="index.js" defer></script>
+    <style>
+body {
+  font-family: Monospace;
+}
+.container {
+  display: grid;
+  column-gap: 10px;
+  row-gap: 7px;
+}
+.keys {
+  background-color: gray;
+  border-radius: 20px;
+  padding-left: 10px;
+}
+.hashBlock {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  grid-row-start: 1;
+  grid-row-end: 4;
+  background-color: gray;
+  border-radius: 20px;
+  text-align: center;
+  min-width: 700px;
+}
+.pubKeys {
+  grid-column-start: 3;
+  grid-column-end: 3;
+  grid-row-start: 1;
+  grid-row-end: 2;
+  background-color: gray;
+  text-align: center;
+  border-radius: 20px;
+}
+.blocks {
+  grid-column-start: 3;
+  grid-column-end: 3;
+  grid-row-start: 3;
+  grid-row-end: 4;
+  background-color: gray;
+  text-align: center;
+  border-radius: 20px;
+}
+hr {
+  width: 90%;
+  margin-top: 0px;
+}
+    </style>
+  </head>
   <body>
-    <form action="/getblock" method="post">
-      <label for="blockHash">Enter Block Hash</label<br>
-      <input type="text" id="blockHash" name="blockHash"></input>
-      <label for="privateKey">Enter Private Key</label>
-      <input type="text" id="privateKey" name="privateKey"></input>
-      <input type="submit" />
-    </form><br />
-    <form action="/newregister" method="get">
-      <label for="blockHash">Get New Key</label<br>
-      <input type="submit" />
-    </form>
-
+      <div class="keys">
+        <p>Public Key</p>
+      </div>
+    <div class="container">
+      <div class="hashBlock">
+        <form action="newregister" method='get'>
+          <input type='submit' />
+        </form>
+      </div>
+      <div class="pubKeys">
+        Public Keys
+        <hr>
+        <div class="keysHolder">
+        </div>
+      </div>
+      <div class="blocks">
+        Blocks
+        <hr>
+        <div class="blocksHolder">
+      </div>
+      </div>
+    </div>
   </body>
 </html>

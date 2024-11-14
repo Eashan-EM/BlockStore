@@ -1,37 +1,34 @@
-const h_key = document.querySelector('#h-key')
-const p_key = document.querySelector('#p-key')
-const h_login = document.querySelector('#h-login')
-const p_login = document.querySelector('#p-login')
+const pubKeys = document.querySelector('.keysHolder')
+const blockHolder = document.querySelector('.blocksHolder')
 
-if(sessionStorage.getItem("user_type") === null) sessionStorage.setItem("user_type", "")
-// if(sessionStorage.getItem("user_type") == "") return
+function formatKey(type, key) {
+  if (type=='public')
+    return key.slice(27, -25)
+}
 
-h_login.addEventListener('click', () => {
-   if(h_key.value == "") return alert("Please Enter The HashKey.")
-    
-        fetch('/login-hospital', ({
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                id: h_key.value
-            })
-        })).then(res => res.json())
-    
-})
+function update() {
+  fetch('/getpubkeys', ({
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }}))
+    .then(res => res.json())
+    .then(res => {
+      for (var i=res.data.length;i>0;i--)
+        pubKeys.innerHTML += `<p>${formatKey('public', res.data[i-1])}</p><hr>`
+    })
 
-p_login.addEventListener('click', () => {
-    if(p_key.value == "") return alert("Please Enter The HashKey.")
-    fetch('/login-patient', ({
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-            id: p_key.value
-        })
-    }))
-})
+  fetch('getblocks', ({
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }}))
+    .then(res => res.json())
+    .then(res => {
+      for (var i=res.data.length;i>0;i--) {
+        val = JSON.parse(res.data[i-1])
+        blockHolder.innerHTML += `<p>Index: ${val.index}</p><p>Timestamp: ${val.timestamp}</p><p>Hash: ${val.hash}</p><p>Public Key: ${formatKey('public', val.pubKey)}</p><hr>`
+    }})}
+update()

@@ -36,6 +36,7 @@ class Block {
 class BlockChain {
   constructor () {
     this.chain = []
+    this.pubKeys = []
     this.index = 0
     if (fs.existsSync('blockchain')) {
       var contents = fs.readFileSync('blockchain')
@@ -51,23 +52,43 @@ class BlockChain {
           parse.pubKey,
           parse.previousHash,
           parse.hash))
+        if (!this.pubKeys.includes(parse.pubKey))
+          this.pubKeys.push(parse.pubKey)
         this.index++
       }
     } else {
-      this.chain.push(new Block(0, Date.now().toString(), "1234", "genesis", 0, ''))
+      var key = this.createKeyPair()
+      this.chain.push(new Block(0, Date.now().toString(), "genesis",key.publicKey, 0, ''))
+      this.pubKeys.push(key.publicKey)
       this.bc = []
       this.index++;
       this.save()
   }}
 
+  getPubKeys() {
+    return JSON.stringify({
+      data: this.pubKeys,
+      err: ""
+    })
+  }
+
+  getBlocks() {
+    return JSON.stringify({
+      data: this.bc,
+      err: ""
+    })
+  }
+
   newBlock(data, pubKey) {
     var block = new Block(
-      this.chain.length,
+      this.index,
       Date.now().toString(),
       this.encrypt(data, pubKey),
       pubKey,
       this.chain[this.index-1].hash,
       '')
+    if (!this.pubKeys.includes(pubKey))
+      this.pubKeys.push(pubKey)
     this.chain.push(block)
     this.index++;
     this.save()
@@ -97,7 +118,6 @@ class BlockChain {
         for (var j=0;j<b.data.length;j++) {
           sendData.data += crypto.privateDecrypt({key:priKey,passphrase:''}, Buffer.from(b.data[j])).toString("utf-8")
         }
-        console.log(sendData)
         return JSON.stringify(sendData)
     }
   }}
