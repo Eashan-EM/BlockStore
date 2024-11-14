@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regsiter Patient - MyMedics</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pregis.js" defer></script>
+</head>
+<body>
+    <div class="header">
+        <center><h1>Register Patient - MyMedics</h1></center>
+    </div>
+    <div class="register-section">
+        <div class="grid2">
+            <div class="info-sec">
+                <center>
+                    <h1>Patient Registeration</h1>
+                    <hr>
+                    <p>Fill this form to register as a patient to our services.</p>
+                </center>
+            </div>
+            <div class="reg-sec">
+          <form action="/registerKey" method="post">
+            <label for="p-name">Patient Name:</label><br>
+            <input type="text" placeholder="Patient Name" id="p-name" name="pname"><br><br>
+            <label for="p-email">Email Address:</label><br>
+            <input type="email" placeholder="Patient Email ID" id="p-email" name="pemail"><br><br>
+            <label for="p-phno">Phone Number:</label><br>
+            <input type="number" placeholder="Patient Phone Number" id="p-phno" name="ppho"><br><br>
+            <label for="p-bg">Blood Group:</label><br>
+            <input type="text" placeholder="Patient Blood Group" id="p-bg" name=pbg><br><br>
+            <label for="p-age">Patient Age:</label><br>
+            <input type="number" placeholder="Patient Age" id="p-age" name="page"><br><br>
+            <label for="p-gender">Patient Gender:</label><br>
+            <input type="text" placeholder="Patient Gender" id="p-gender" name="pgender"><br><br>
+            <center>
+                <input type="submit" id="h-register" class="btn" value="Register Patient" />
+            </center>
+          </form>
+        </div>
+    </div>
+    <div class="footer">&copy; 2024, Technista</div>
+</body>
+</html>

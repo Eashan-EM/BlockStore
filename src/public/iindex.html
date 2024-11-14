@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyMedics</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="index.js" defer></script>
+</head>
+<body>
+    <div class="header">
+        <center><h1>MyMedics</h1></center>
+    </div>
+    <div class="login-section">
+        <div class="grid2">
+            <div class="h-login-sec"><center>
+                <h2>Login As Hospital</h2>
+                <p>Login using the Hospital Details</p>
+            </center>
+              <form action="/hospital" method="post">
+                <label for="h-key">Hospital HashKey:</label><br>
+                <input type="text" placeholder="Registered Hospital Hashkey" id="h-key" name="hkey"><br>
+                <center>
+                    <input type="submit" id="h-login" class="btn" value="Login as Hospital" />
+                    <a href="hregis"><p id="h-register-label">New Registeration? Click Here.</p></a>
+                </center>
+              </form>
+        </div>
+            <div class="p-login-sec"><center>
+                <h2>Login As Patient</h2>
+                <p>Login using the Patient Details</p>
+            </center>
+            <form action="/patient" method="post">
+            <label for="p-key">Patient HashKey:</label><br>
+            <input type="text" placeholder="Registered Patient Hashkey" id="p-key" name="pid"><br>
+            <center>
+                <input type="submit" id="p-login" class="btn" value="Login as Patient" />
+                <a href="/pregis"><p id="p-register-label">New Registeration? Click Here.</p></a>
+            </center>
+            </form>
+        </div>
+    </div>
+    <div class="footer">&copy; 2024, Technista</div>
+</body>
+</html>

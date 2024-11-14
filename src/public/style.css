@@ -1,0 +1,39 @@
+:root {
+    --color-blue: #1b2c89;
+}
+
+.grid2 {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+input {
+    padding: 1em;
+    border: 0;
+    border-bottom: solid 1px black;
+    width: 80%;
+}
+
+body {
+    padding-left: 5em;
+    padding-right: 5em;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    margin-bottom: 0.4em;
+}
+
+.btn {
+    background-color: var(--color-blue);
+    padding: 1em;
+    width: 50%;
+    margin: 1em;
+    color: white;
+    font-size: 15px;
+}
+
+.p-register-label, .h-register-label {
+    cursor: pointer;
+}
