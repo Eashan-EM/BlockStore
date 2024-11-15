@@ -5,17 +5,6 @@
 body {
   font-family: Monospace;
 }
-.create {
-  color: white;
-  position: absolute;
-  z-index: 2;
-  left: 40%;
-  top: 30%;
-  width: 20vw;
-  background-color: black;
-  text-align:center;
-  border-radius: 10px;
-}
 
 #checkKey {
   color: white;
@@ -25,22 +14,31 @@ body {
   background-color: black;
 }
 
-.holder {
-  display: grid; 
-  justify-content: center; 
-  overflow: hidden;
-  row-gap: 7px;
-  filter: blur(0px);
-}
 .container {
   display: grid;
   column-gap: 10px;
   row-gap: 7px;
 }
-.keys {
+.keysHold {
   background-color: gray;
   border-radius: 10px;
   padding-left: 15px;
+}
+.hashbuttons {
+  display: grid;
+  column-gap: 0px;
+}
+.addkey {
+  grid-column-start: 1;
+  border-radius: 20px 0px 10px 0px;
+}
+.newkey {
+  grid-column-start: 2;
+  border-radius: 0px 0px 0px 0px;
+}
+.getblock {
+  grid-column-start: 3;
+  border-radius: 0px 20px 0px 10px;
 }
 .hashBlock {
   grid-column-start: 1;
@@ -69,7 +67,71 @@ body {
   background-color: gray;
   text-align: center;
   border-radius: 20px;
+  min-height: 50px;
 }
+.blockButtons {
+  display: grid;
+  border-radius: 20px 20px 0px 0px;
+  column-gap: 0px;
+}
+.allblocks {
+  grid-column-start: 1;
+  grid-column-end: 1;
+  border-bottom: 2px solid black;
+  border-right: 2px solid black;
+  border-radius: 20px 0px 10px 0px;
+}
+.pblocks {
+  grid-column-start: 2;
+  grid-column-end: 2;
+  border-bottom: 2px solid black;
+  border-left: 2px solid black;
+  border-radius: 0px 20px 0px 10px;
+}
+
+.keyvalue {
+  margin: 7px 7px 0px 7px;
+}
+.storekeyvalue {
+  display: grid;
+  margin-top: 10px;
+}
+.keyHold {
+  position: relative;
+  left: 150px;
+  padding-top: 10px;
+  grid-column-start: 1;
+  text-align: center;
+  width: 100px;
+  height: 50px;
+  border: 2px solid black;
+  border-radius: 10px;
+}
+.valueHold {
+  grid-column-start: 2;
+  width: 200px;
+  height: 60px;
+  border: 2px solid black;
+  border-radius: 10px;
+}
+button {
+  margin-top: 10px;
+  background-color: rgba(0, 0, 0, 0.0);
+  height: 50px;
+  width: 200px;
+  border-radius: 10px;
+}
+.value {
+  background-color: rgba(0,0,0, 0.0);
+  height: 100%;
+  width: 100%;
+  border: none;
+}
+
+#addNewKey {
+  background-color: black;
+}
+
 hr {
   width: 90%;
   margin-top: 0px;
@@ -77,26 +139,21 @@ hr {
     </style>
   </head>
   <body>
-      <div class="create">
-        <p>Can't Find Key Pair</p><hr>
-        <label for="pubKey">Public Key</p>
-          <input type="text" class="takePubKey"></input><br>
-        <p>Private Key</p>
-        <input type="text" class="takePriKey"> </input><br>
-        <input type="submit" onclick="checkKey()" id="checkKey" value="Submit">
-        <p>or</p>
-        <a href="newregister"><p>New Registration</p></a>
-      </div>
-      <div class="holder">
-      <div class="keys">
+      <div class="keysHold">
         <p class="pubKey">Public Key: </p>
         <p class='priKey'>Private Key: </p>
       </div>
     <div class="container">
       <div class="hashBlock">
-        <form action="newregister" method='get'>
-          <input type='submit' />
-        </form>
+        <div class="hashButtons">
+          <label class="addkey" onclick="sKey()">Select Key</label>
+          <label class="newkey" onclick="aKey()">New Key</label>
+          <label class="getblock" onclick="gBlock()">Get Block</label>
+        </div>
+        <div class="show">
+          <div class="keyvalue">
+          </div>
+        </div>
       </div>
       <div class="pubKeys">
         Public Keys
@@ -105,12 +162,13 @@ hr {
         </div>
       </div>
       <div class="blocks">
-        Blocks
-        <hr>
+        <div class="blockButtons">
+        <label class="allblocks" onclick="allblocks()">All Blocks</label>
+        <label class="pblocks" onclick="pblocks()">Your Blocks</label>
+        </div>
         <div class="blocksHolder">
       </div>
       </div>
     </div>
-      </div>
   </body>
 </html>
