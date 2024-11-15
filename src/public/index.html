@@ -5,6 +5,33 @@
 body {
   font-family: Monospace;
 }
+.create {
+  color: white;
+  position: absolute;
+  z-index: 2;
+  left: 40%;
+  top: 30%;
+  width: 20vw;
+  background-color: black;
+  text-align:center;
+  border-radius: 10px;
+}
+
+#checkKey {
+  color: white;
+  margin-top: 5px;
+  border-color: white;
+  border-radius: 20px;
+  background-color: black;
+}
+
+.holder {
+  display: grid; 
+  justify-content: center; 
+  overflow: hidden;
+  row-gap: 7px;
+  filter: blur(0px);
+}
 .container {
   display: grid;
   column-gap: 10px;
@@ -12,8 +39,8 @@ body {
 }
 .keys {
   background-color: gray;
-  border-radius: 20px;
-  padding-left: 10px;
+  border-radius: 10px;
+  padding-left: 15px;
 }
 .hashBlock {
   grid-column-start: 1;
@@ -50,8 +77,20 @@ hr {
     </style>
   </head>
   <body>
+      <div class="create">
+        <p>Can't Find Key Pair</p><hr>
+        <label for="pubKey">Public Key</p>
+          <input type="text" class="takePubKey"></input><br>
+        <p>Private Key</p>
+        <input type="text" class="takePriKey"> </input><br>
+        <input type="submit" onclick="checkKey()" id="checkKey" value="Submit">
+        <p>or</p>
+        <a href="newregister"><p>New Registration</p></a>
+      </div>
+      <div class="holder">
       <div class="keys">
-        <p>Public Key</p>
+        <p class="pubKey">Public Key: </p>
+        <p class='priKey'>Private Key: </p>
       </div>
     <div class="container">
       <div class="hashBlock">
@@ -72,5 +111,6 @@ hr {
       </div>
       </div>
     </div>
+      </div>
   </body>
 </html>
