@@ -39,7 +39,7 @@ function loadKeys() {
     update()
   } else {
     keys = JSON.parse(localStorage.getItem('keys'))
-    var d = JSON.parse(keys[0])
+    var d = JSON.parse(keys[keys.length-1])
     currentKey.pubKey = d.pubKey
     currentKey.priKey = d.priKey
     document.querySelector(".pubKey").innerHTML += formatKey("public", currentKey.pubKey)
@@ -67,8 +67,9 @@ function checkKey() {
 
 function update() {
   getPubKeys().then(res => {
+    pubKeys.innerHTML = ''
     for (var i=res.data.length;i>0;i--)
-    pubKeys.innerHTML += `<p>${formatKey('public', res.data[i-1])}</p><hr>`
+      pubKeys.innerHTML += `<p>${formatKey('public', res.data[i-1])}</p><hr>`
   })
   allblocks()
 }
@@ -97,7 +98,16 @@ function allblocks() {
       allBlocks.style["border"] = "none"
       for (var i=res.data.length;i>0;i--) {
         val = JSON.parse(res.data[i-1])
-        blockHolder.innerHTML += `<p>Index: ${val.index}</p><p>Timestamp: ${val.timestamp}</p><p>Hash: ${val.hash}</p><p>Public Key: ${formatKey('public', val.pubKey)}</p><hr>`
+        blockHolder.innerHTML += `
+        <div class="openBlock" onclick="openBlock('${val.hash}')">
+          <p>Index: ${val.index}</p>
+          <p>Timestamp: ${val.timestamp}</p>
+          <span>Hash: ${val.hash}<span>
+          <button class="copy" onclick="copyKey('${val.hash}')">
+            <img src="copy-icon.webp" height=13></img>
+          </button>
+          <p>Public Key: ${formatKey('public', val.pubKey)}</p><hr>
+        </div>`
     }})
 }
 
@@ -117,29 +127,34 @@ function pblocks() {
       for (var i=res.data.length;i>0;i--) {
         val = JSON.parse(res.data[i-1])
         if (val.pubKey==currentKey.pubKey)
-          blockHolder.innerHTML += `<p>Index: ${val.index}</p><p>Timestamp: ${val.timestamp}</p><p>Hash: ${val.hash}</p><p>Public Key: ${formatKey('public', val.pubKey)}</p><hr>`
+          blockHolder.innerHTML += `
+          <div class="openBlock" onclick="openBlock('${val.hash}')">
+            <p>Index: ${val.index}</p>
+            <p>Timestamp: ${val.timestamp}</p>
+            <span>Hash: ${val.hash}<span>
+            <button class="copy" onclick="copyKey('${val.hash}')">
+              <img src="copy-icon.webp" height=13></img>
+            </button>
+            <p>Public Key: ${formatKey('public', val.pubKey)}</p><hr>
+          </div>`
     }})
 }
 
-function formatShow(type, data) {
+function formatShow(data, keyEdit, dataEdit) {
   var sendData = ''
+  var keyM = (keyEdit==true)?"textarea":"p"
+  var dataM = (dataEdit==true)?"textarea":"p"
   for (var i=0;i<data.keys.length;i++) {
     sendData += `
     <div class="storekeyvalue">
       <div class="keyHold">
-        <p class="key">${data.keys[i]}</p>
-      </div>`
-    if (type=="edit") {
-      sendData += `<div class="valueHold">
-        <textarea id="value${i}" class="value" placeholder="Value"></textarea>
+        <${keyM} class="key">${data.keys[i]}</${keyM}>
       </div>
-    </div>`
-    } else if (type=="show") {
-      sendData += `<div class="valueHold">
-        <p id="value${i}" class="value" placeholder="Value">${data.values[i]}<p>
+      <div class="valueHold">
+        <${dataM} id="value${i}" class="value" placeholder="Value">${data.values[i]}</${dataM}>
       </div>
-    </div>`
-    }
+    </div>
+    `
   }
   return sendData
 }
@@ -158,24 +173,10 @@ function aKey() {
   getBlock.style["border-radius"] = "0px 20px 0px 10px"
   selectKey.style["border-radius"] = "20px 0px 10px 0px"
 
-  /*keyValue.innerHTML = formatShow("edit", {
-    keys: ["Public Key", "Private Key"],
-    values: []
-  })
-
-  var button = document.createElement('button')
-  button.id = "addnewkey"
-  button.onclick = function() {
-    var pub = document.getElementById("value0").value
-    var pri = document.getElementById("value1").value
-    saveKey(pub, pri)
-  }
-  button.innerHTML = "Add Keys"
-  keyValue.appendChild(button)*/
-
-  keyValue.innerHTML = formatShow("edit", {
-    keys: ["Name", "Email", "Phone No.", "Blood Group", "Age", "Gender"]
-  })
+  keyValue.innerHTML = formatShow({
+    keys: ["Name", "Email", "Phone No.", "Blood Group", "Age", "Gender"],
+    values: ['', '', '', '', '', '']
+  }, false, true)
   var button = document.createElement('button')
   button.id = "registerbutton"
   button.onclick = function() {
@@ -213,12 +214,12 @@ function gBlock() {
   addKey.style["border-radius"] = "0px 0px 10px 0px"
   selectKey.style["background-color"] = "#d3d3d3"
 
-  keyValue.innerHTML = formatShow("edit", {
+  keyValue.innerHTML = formatShow({
     keys: ["Block Hash"],
-    values: []
-  })
+    values: ['']
+  }, false, true)
   var button = document.createElement('button')
-  button.id = "sendButton"
+  button.class = "sendButton"
   button.onclick = function() {
     const h = document.querySelector("#value0").value
     fetch('/getblock', ({
@@ -235,15 +236,14 @@ function gBlock() {
       .then(res => res.json())
       .then(data => {
         var d = JSON.parse(data.data)
-        keyValue.innerHTML = formatShow("show", {
+        keyValue.innerHTML = formatShow({
           keys: d.key,
           values: d.value
-        })
+        }, false, false)
         currentHash = d
         var button2 = document.createElement('button')
         button2.id = "editButton"
         button2.onclick = function() {
-          console.log(currentHash.hash)
           keyValue.innerHTML = formatShow() 
         }
         button2.innerHTML = "Edit Information"
@@ -254,4 +254,42 @@ function gBlock() {
   keyValue.appendChild(button)
 }
 
+function copyKey(type) {
+  if (type=="pub")
+    navigator.clipboard.writeText(currentKey.pubKey)
+  else if (type=="pri")
+    navigator.clipboard.writeText(currentKey.priKey)
+  else
+    navigator.clipboard.writeText(type)
+}
+function openBlock(hash) {
+  console.log("here")
+  fetch('/getblock', ({
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        blockHash: hash,
+        privateKey: currentKey.priKey
+      })
+    }))
+      .then(res => res.json())
+      .then(data => {
+        var d = JSON.parse(data.data)
+        keyValue.innerHTML = formatShow({
+          keys: d.key,
+          values: d.value
+        }, false, false)
+        currentHash = d
+        var button2 = document.createElement('button')
+        button2.id = "editButton"
+        button2.onclick = function() {
+          keyValue.innerHTML = formatShow() 
+        }
+        button2.innerHTML = "Edit Information"
+        keyValue.appendChild(button2)
+      })
+}
 loadKeys()

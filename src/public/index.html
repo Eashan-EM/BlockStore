@@ -21,8 +21,22 @@ body {
 }
 .keysHold {
   background-color: gray;
+  display: grid;
   border-radius: 10px;
   padding-left: 15px;
+  margin-bottom: 10px;
+}
+.pubKey {
+  grid-column-start: 1;
+}
+.prikey {
+  grid-column-start: 1;
+}
+.copy {
+  grid-column-start: 2;
+  height: 10px;
+  width: 100px;
+  border: none;
 }
 .hashbuttons {
   display: grid;
@@ -141,7 +155,9 @@ hr {
   <body>
       <div class="keysHold">
         <p class="pubKey">Public Key: </p>
+        <button class="copy" onclick="copyKey('pub')"><img src="copy-icon.webp" height=13></img></button>
         <p class='priKey'>Private Key: </p>
+        <button class="copy" onclick="copyKey('pri')"><img src="copy-icon.webp" height=13></img></button>
       </div>
     <div class="container">
       <div class="hashBlock">
