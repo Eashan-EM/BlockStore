@@ -6,6 +6,8 @@ const selectKey = document.querySelector('.addkey')
 const addKey = document.querySelector('.newkey')
 const getBlock = document.querySelector('.getblock')
 const keyValue = document.querySelector('.keyvalue')
+var choosenKey = 0
+var currentBlock = {}
 var currentHash = {}
 
 var currentKey = {
@@ -30,6 +32,7 @@ function saveKey(pubKey, priKey) {
         priKey: priKey
       }))
       localStorage.setItem('keys', JSON.stringify(keys))
+      choosenKey = keys.length - 1
       loadKeys()
 }}})}
 
@@ -39,11 +42,11 @@ function loadKeys() {
     update()
   } else {
     keys = JSON.parse(localStorage.getItem('keys'))
-    var d = JSON.parse(keys[keys.length-1])
+    var d = JSON.parse(keys[choosenKey])
     currentKey.pubKey = d.pubKey
     currentKey.priKey = d.priKey
-    document.querySelector(".pubKey").innerHTML += formatKey("public", currentKey.pubKey)
-    document.querySelector(".priKey").innerHTML += formatKey("private", currentKey.priKey)
+    document.querySelector(".pubKey").innerHTML = formatKey("public", currentKey.pubKey)
+    document.querySelector(".priKey").innerHTML = formatKey("private", currentKey.priKey)
     gBlock()
     update()
   }
@@ -85,6 +88,7 @@ function getPubKeys() {
 }
 
 function allblocks() {
+  blockHolder.innerHTML = ''
   fetch('/getblocks', ({
     method: 'GET',
     headers: {
@@ -112,6 +116,7 @@ function allblocks() {
 }
 
 function pblocks() {
+  blockHolder.innerHTML = ''
   fetch('/getblocks', ({
     method: 'GET',
     headers: {
@@ -164,6 +169,16 @@ function sKey() {
   addKey.style["background-color"] = "#d3d3d3"
   addKey.style["border-radius"] = "0px 0px 0px 10px"
   getBlock.style["background-color"] = "#d3d3d3"
+
+  keyValue.innerHTML = '<p>Choose Private Key</p>'
+  for (var i=0;i<keys.length;i++) {
+    var sPri = JSON.parse(keys[i]).priKey
+    keyValue.innerHTML += `
+      <button class="selectKeys" onclick='chooseKey(${i})'>
+        ${formatKey("private", sPri)}
+      </button><br>
+    `
+  }
 }
 
 function aKey() {
@@ -172,8 +187,16 @@ function aKey() {
   getBlock.style["background-color"] = "#d3d3d3"
   getBlock.style["border-radius"] = "0px 20px 0px 10px"
   selectKey.style["border-radius"] = "20px 0px 10px 0px"
-
+  
   keyValue.innerHTML = formatShow({
+    keys: ["Public Key", "Private Key"],
+    values: ["", ""]
+  }, false, true)
+  keyValue.innerHTML = keyValue.innerHTML.replace(/value0/g, 'newPub').replace(/value1/g, 'newPri')
+  keyValue.innerHTML += `
+    <button onclick="addKeys()">Add Keys</button>
+    <p>or</p><hr>`
+  keyValue.innerHTML += formatShow({
     keys: ["Name", "Email", "Phone No.", "Blood Group", "Age", "Gender"],
     values: ['', '', '', '', '', '']
   }, false, true)
@@ -199,7 +222,6 @@ function aKey() {
     }))
       .then(res => res.json())
       .then(data => {
-        console.log(data)
         saveKey(data.pubKey, data.priKey)
       })
   }
@@ -222,33 +244,7 @@ function gBlock() {
   button.class = "sendButton"
   button.onclick = function() {
     const h = document.querySelector("#value0").value
-    fetch('/getblock', ({
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        blockHash: h,
-        privateKey: currentKey.priKey
-      })
-    }))
-      .then(res => res.json())
-      .then(data => {
-        var d = JSON.parse(data.data)
-        keyValue.innerHTML = formatShow({
-          keys: d.key,
-          values: d.value
-        }, false, false)
-        currentHash = d
-        var button2 = document.createElement('button')
-        button2.id = "editButton"
-        button2.onclick = function() {
-          keyValue.innerHTML = formatShow() 
-        }
-        button2.innerHTML = "Edit Information"
-        keyValue.appendChild(button2)
-      })
+    openBlock(h)
   }
   button.innerHTML = "Get Block Data"
   keyValue.appendChild(button)
@@ -263,7 +259,6 @@ function copyKey(type) {
     navigator.clipboard.writeText(type)
 }
 function openBlock(hash) {
-  console.log("here")
   fetch('/getblock', ({
       method: 'POST',
       headers: {
@@ -278,6 +273,7 @@ function openBlock(hash) {
       .then(res => res.json())
       .then(data => {
         var d = JSON.parse(data.data)
+        currentBlock = d
         keyValue.innerHTML = formatShow({
           keys: d.key,
           values: d.value
@@ -286,10 +282,27 @@ function openBlock(hash) {
         var button2 = document.createElement('button')
         button2.id = "editButton"
         button2.onclick = function() {
-          keyValue.innerHTML = formatShow() 
+          edit()
         }
         button2.innerHTML = "Edit Information"
         keyValue.appendChild(button2)
       })
+}
+function edit() {
+  
+}
+function chooseKey(i) {
+  choosenKey = i
+  loadKeys()
+}
+function addKeys() {
+  var p1 = document.getElementById("newPub")
+  var p2 = document.getElementById("newPri")
+  for (var i=0;i<keys.length;i++) {
+    var val = JSON.parse(keys[i])
+    if (p1.value == val.pubKey && p2!='') {
+      saveKey(p1, p2)
+    }
+  }
 }
 loadKeys()

@@ -34,9 +34,17 @@ body {
 }
 .copy {
   grid-column-start: 2;
-  height: 10px;
-  width: 100px;
+  margin-right: 50px;
+  width: 30px;
+  height: 25px;
   border: none;
+  border-radius: 5px;
+}
+.copy:hover {
+  border: 1px black solid;
+}
+.copy:focus {
+  border: 2px #39ff14 solid;
 }
 .hashbuttons {
   display: grid;
@@ -141,7 +149,11 @@ button {
   width: 100%;
   border: none;
 }
-
+.selectKeys {
+  margin-left: 10px;
+  width: 550px;
+  height: 200px;
+}
 #addNewKey {
   background-color: black;
 }
@@ -154,9 +166,9 @@ hr {
   </head>
   <body>
       <div class="keysHold">
-        <p class="pubKey">Public Key: </p>
+        Public Key: <span class="pubKey"></span>
         <button class="copy" onclick="copyKey('pub')"><img src="copy-icon.webp" height=13></img></button>
-        <p class='priKey'>Private Key: </p>
+        Private Key: <span class='priKey'></span>
         <button class="copy" onclick="copyKey('pri')"><img src="copy-icon.webp" height=13></img></button>
       </div>
     <div class="container">
