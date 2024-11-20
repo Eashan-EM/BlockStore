@@ -6,8 +6,12 @@ const selectKey = document.querySelector('.addkey')
 const addKey = document.querySelector('.newkey')
 const getBlock = document.querySelector('.getblock')
 const keyValue = document.querySelector('.keyvalue')
-var choosenKey = 0
+var cookie = {
+  selectedKey: 0,
+  yourBlock: true
+}
 var currentBlock = {}
+var editBlock = {}
 var currentHash = {}
 
 var currentKey = {
@@ -32,7 +36,7 @@ function saveKey(pubKey, priKey) {
         priKey: priKey
       }))
       localStorage.setItem('keys', JSON.stringify(keys))
-      choosenKey = keys.length - 1
+      cookie.selectedKey = keys.length - 1
       loadKeys()
 }}})}
 
@@ -42,7 +46,7 @@ function loadKeys() {
     update()
   } else {
     keys = JSON.parse(localStorage.getItem('keys'))
-    var d = JSON.parse(keys[choosenKey])
+    var d = JSON.parse(keys[cookie.selectedKey])
     currentKey.pubKey = d.pubKey
     currentKey.priKey = d.priKey
     document.querySelector(".pubKey").innerHTML = formatKey("public", currentKey.pubKey)
@@ -74,7 +78,10 @@ function update() {
     for (var i=res.data.length;i>0;i--)
       pubKeys.innerHTML += `<p>${formatKey('public', res.data[i-1])}</p><hr>`
   })
-  allblocks()
+  if (cookie.yourBlock==true)
+    pblocks()
+  else
+    allblocks()
 }
   
 function getPubKeys() {
@@ -88,6 +95,8 @@ function getPubKeys() {
 }
 
 function allblocks() {
+  cookie.yourBlock = false
+  writeCookie()
   blockHolder.innerHTML = ''
   fetch('/getblocks', ({
     method: 'GET',
@@ -116,6 +125,8 @@ function allblocks() {
 }
 
 function pblocks() {
+  cookie.yourBlock = true
+  writeCookie()
   blockHolder.innerHTML = ''
   fetch('/getblocks', ({
     method: 'GET',
@@ -153,7 +164,7 @@ function formatShow(data, keyEdit, dataEdit) {
     sendData += `
     <div class="storekeyvalue">
       <div class="keyHold">
-        <${keyM} class="key">${data.keys[i]}</${keyM}>
+        <${keyM} id="key${i}" class="key">${data.keys[i]}</${keyM}>
       </div>
       <div class="valueHold">
         <${dataM} id="value${i}" class="value" placeholder="Value">${data.values[i]}</${dataM}>
@@ -279,20 +290,109 @@ function openBlock(hash) {
           values: d.value
         }, false, false)
         currentHash = d
-        var button2 = document.createElement('button')
-        button2.id = "editButton"
-        button2.onclick = function() {
-          edit()
-        }
-        button2.innerHTML = "Edit Information"
-        keyValue.appendChild(button2)
+        keyValue.innerHTML += `
+        <button id="editButton" onclick="edit()">Edit Information</button>
+        <button id="shareBlock" onclick="share()">Share Information</button>
+        `
       })
 }
+function editRefresh() {
+  for (var i=0;i<editBlock.key.length;i++) {
+    var key = document.getElementById(`key${i}`)
+    var value = document.getElementById(`value${i}`)
+    editBlock.key[i] = key.value
+    editBlock.value[i] = value.value
+  }
+}
 function edit() {
-  
+  editBlock = currentBlock
+  keyValue.innerHTML = formatShow({
+    keys: currentBlock.key,
+    values: currentBlock.value
+  }, true, true)
+  keyValue.innerHTML += `
+  <button class="addSection" onclick="addSection()">
+    Add Section
+  </button>
+  <button class="save" onclick="saveBlock()">
+    Save Information
+  </button>
+  `
+}
+function addSection() {
+  editRefresh()
+  editBlock.key.push("")
+  editBlock.value.push("")
+  edit()
+}
+function saveBlock() {
+  editRefresh()
+  currentBlock = editBlock
+  fetch('/shared', ({
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        data: JSON.stringify(editBlock),
+        key: currentKey.pubKey
+      })
+    }))
+      .then(res => res.json())
+      .then(data => {
+        keyValue.innerHTML = formatShow({
+          keys: ["Hash"],
+          values: [data.data]
+        }, false, false)
+        keyValue.innerHTML += `
+        <button class="copy" onclick="copyKey('${data.data}')">
+          <img src="copy-icon.webp" height=13></img>
+        </button>
+        `
+        update()
+      })
+
+}
+function share() {
+  keyValue.innerHTML = formatShow({
+    keys: ["Recipient Public Key"],
+    values: [""]
+  }, false, true)
+  keyValue.innerHTML += `
+  <button class="shareBlock" onclick="sBlock()">Share Block</button>
+  `
+}
+function sBlock() {
+  const v0 = document.getElementById("value0")
+  fetch('/shared', ({
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        data: JSON.stringify(currentBlock),
+        key: v0.value
+      })
+    }))
+      .then(res => res.json())
+      .then(data => {
+        keyValue.innerHTML = formatShow({
+          keys: ["Hash"],
+          values: [data.data]
+        }, false, false)
+        keyValue.innerHTML += `
+        <button class="copy" onclick="copyKey('${data.data}')">
+          <img src="copy-icon.webp" height=13></img>
+        </button>
+        `
+        update()
+      })
 }
 function chooseKey(i) {
-  choosenKey = i
+  cookie.selectedKey = i
+  writeCookie()
   loadKeys()
 }
 function addKeys() {
@@ -304,5 +404,13 @@ function addKeys() {
       saveKey(p1, p2)
     }
   }
+}
+function writeCookie() {
+  localStorage.setItem("cookie", JSON.stringify(cookie))
+}
+if (localStorage.getItem("cookie")!=null) {
+  cookie = JSON.parse(localStorage.getItem("cookie"))
+} else {
+  writeCookie()
 }
 loadKeys()
